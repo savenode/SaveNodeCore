@@ -1,0 +1,26 @@
+[Unit]
+Description=savenode's distributed currency daemon
+After=network.target
+
+[Service]
+User=savenode
+Group=savenode
+
+Type=forking
+PIDFile=/var/lib/savenoded/savenoded.pid
+
+ExecStart=/usr/bin/savenoded -daemon -pid=/var/lib/savenoded/savenoded.pid \
+          -conf=/etc/savenode/savenode.conf -datadir=/var/lib/savenoded
+
+ExecStop=-/usr/bin/savenode-cli -conf=/etc/savenode/savenode.conf \
+         -datadir=/var/lib/savenoded stop
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

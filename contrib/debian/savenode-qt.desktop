@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=savenode
+Comment=savenode P2P Cryptocurrency
+Comment[fr]=savenode, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=savenode, eşten eşe kriptografik sanal para birimi
+Exec=savenode-qt %u
+Terminal=false
+Type=Application
+Icon=savenode128
+MimeType=x-scheme-handler/savenode;
+Categories=Office;Finance;

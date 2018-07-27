@@ -1,0 +1,2 @@
+qt/qt_libbitcoinqt_a-qrc_savenode_locale.o: \
+ qt/qrc_savenode_locale.cpp
