@@ -60,61 +60,48 @@ struct CNodeStateStats;
 inline int64_t GetMstrNodCollateral(int nHeight){
 
 
-      if(nHeight < 600)
+      if(nHeight < 2000)
       {
         return 500;
       }
-      else if(nHeight >= 600 && nHeight < 5000)
+      else if(nHeight >= 2000 && nHeight < 20000)
       {
         return 1000;
       }
-      else if(nHeight >= 5000 && nHeight < 10000)
-      {
-        return 2000;
-      }
-      else if(nHeight >= 10000 && nHeight < 15000)
-      {
-        return 3000;
-      }
-      else if(nHeight >= 15000 && nHeight < 20000)
+      else if(nHeight >= 20000 && nHeight < 40000)
       {
         return 5000;
       }
-      else if(nHeight >= 20000 && nHeight < 25000)
+      else if(nHeight >= 40000 && nHeight < 60000)
       {
         return 10000;
       }
-
-      else if(nHeight >= 25000 && nHeight < 50000)
+      else if(nHeight >= 60000 && nHeight < 100000)
+      {
+        return 15000;
+      }
+      else if(nHeight >= 100000 && nHeight < 150000)
       {
         return 30000;
       }
-      else if(nHeight >= 50000 && nHeight < 100000)
-      {
-        return 40000;
-      }
 
-      else if(nHeight >= 100000 && nHeight < 300000)
+      else if(nHeight >= 150000 && nHeight < 300000)
       {
         return 60000;
       }
       else if(nHeight >= 300000 && nHeight < 1000000)
       {
-        return 100000;
+        return 150000;
       }
 
       else if(nHeight >= 1000000 && nHeight < 3000000)
       {
-        return 150000;
+        return 300000;
       }
 
-      else if(nHeight >= 3000000 && nHeight < 10000000)
-      {
-        return 200000;
-      }
       else
       {
-        return 300000;
+        return 600000;
       }
 
 }

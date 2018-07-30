@@ -2128,32 +2128,28 @@ int64_t GetBlockValue(int nHeight)
 
       if (nHeight == 0) {
              nSubsidy = 300000 * COIN;
-      } else if (nHeight <= 600 && nHeight > 0) {
-                nSubsidy = 5 * COIN;
-      } else if (nHeight <= 5000 && nHeight > 600) {
+      } else if (nHeight <= 100 && nHeight > 0) {
+                nSubsidy = 1 * COIN;
+      } else if (nHeight <= 2000 && nHeight > 100) {
+          nSubsidy = 10 * COIN;
+      } else if (nHeight <= 20000 && nHeight > 2000) {
           nSubsidy = 50 * COIN;
-      } else if (nHeight <= 10000 && nHeight > 5000) {
+      } else if (nHeight <= 40000 && nHeight > 20000) {
           nSubsidy = 100 * COIN;
-      } else if (nHeight <= 15000 && nHeight > 10000) {
+      } else if (nHeight <= 60000 && nHeight > 40000) {
           nSubsidy = 200 * COIN;
-      } else if (nHeight <= 20000 && nHeight > 15000) {
+      } else if (nHeight <= 100000 && nHeight > 60000) {
           nSubsidy = 400 * COIN;
-      } else if (nHeight <= 25000 && nHeight > 20000) {
+      } else if (nHeight <= 150000 && nHeight > 100000) {
           nSubsidy = 1000 * COIN;
-      }  else if (nHeight <= 50000 && nHeight > 25000) {
+      }  else if (nHeight <= 300000 && nHeight > 150000) {
           nSubsidy = 2000 * COIN;
-      } else if (nHeight <= 100000 && nHeight > 50000) {
-          nSubsidy = 1750 * COIN;
-      }  else if (nHeight <= 300000 && nHeight > 100000) {
-          nSubsidy = 1500 * COIN;
       } else if (nHeight <= 1000000 && nHeight > 300000) {
-          nSubsidy = 1000 * COIN;
+          nSubsidy = 750 * COIN;
       }  else if (nHeight <= 3000000 && nHeight > 1000000) {
           nSubsidy = 500 * COIN;
-      }  else if (nHeight <= 10000000 && nHeight > 3000000) {
-          nSubsidy = 250 * COIN;
       }  else {
-          nSubsidy = 1 * COIN;
+          nSubsidy = 10 * COIN;
       }
 
       // Check if we reached the coin max supply.

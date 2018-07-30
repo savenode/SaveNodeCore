@@ -320,6 +320,7 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
         } else {
             txNew.vout.resize(2);
             txNew.vout[1].scriptPubKey = payee;
+            LogPrint("masternode","CreateNewBlock: Failed to detect masternode to pay\n");
             txNew.vout[1].nValue = masternodePayment;
             txNew.vout[0].nValue = blockValue - masternodePayment;
         }
