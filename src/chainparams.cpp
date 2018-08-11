@@ -58,10 +58,10 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 // + Contains no strange transactions
 static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
-    (0, uint256("0x000007a584d29a2cb6b0204fa72fcfddefb93cf3a99764bd70fb96fc92b0d65f"));
+    (0, uint256("0x0000000ed25232c2c2057359a16431665d99301ea6890adbb6f36b64c3d291d9"));
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1532938456, // * UNIX timestamp of last checkpoint block
+    1533968405, // * UNIX timestamp of last checkpoint block
     0,    // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     1440        // * estimated number of transactions per day after checkpoint
@@ -71,7 +71,7 @@ static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1532938456,
+    1533968405,
     0,
     250};
 
@@ -79,7 +79,7 @@ static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
     boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataRegtest = {
     &mapCheckpointsRegtest,
-    1532938456,
+    1533968405,
     0,
     100};
 
@@ -157,11 +157,11 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1532938456;
+        genesis.nTime = 1533968405;
         genesis.nBits = 0x1e0ffff0;
-        genesis.nNonce = 3143938;
+        genesis.nNonce = 3673666;
 
-        hashGenesisBlock = uint256("0x000007a584d29a2cb6b0204fa72fcfddefb93cf3a99764bd70fb96fc92b0d65f");
+        hashGenesisBlock = uint256("0x0000000ed25232c2c2057359a16431665d99301ea6890adbb6f36b64c3d291d9");
         if (false && genesis.GetHash() != hashGenesisBlock)
         {
             printf("recalculating params for mainnet.\n");
@@ -179,7 +179,7 @@ public:
         }
         printf("Genesis Generated");
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x000007a584d29a2cb6b0204fa72fcfddefb93cf3a99764bd70fb96fc92b0d65f"));
+        assert(hashGenesisBlock == uint256("0x0000000ed25232c2c2057359a16431665d99301ea6890adbb6f36b64c3d291d9"));
         assert(genesis.hashMerkleRoot == uint256("0x5648eee81072accaae43339ee1e40537ab634b54673c5157474519d5b84dc55c"));
 
     		 // vSeeds.push_back(CDNSSeedData("seed1.sndcoin.org", "seed1.sndcoin.org"));             // seed1
