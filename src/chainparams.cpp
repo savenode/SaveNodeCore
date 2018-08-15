@@ -120,12 +120,12 @@ public:
         nTargetTimespan = 1 * 30; // savenode: 0.5 minutes
         nTargetSpacingSlowLaunch = 10 * 60;  // savenode: 10 minutes (Slow launch - Block 288)
         nTargetSpacing = 1 * 60;  // savenode: 60 Seconds
-        nMaturity = 49;
+        nMaturity = 19;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 2000000000 * COIN;
 
         /** Height or Time Based Activations **/
-        nLastPOWBlock = 50;
+        nLastPOWBlock = 60;
         nModifierUpdateBlock = 999999999;
         nZerocoinStartHeight = 601;
         nAccumulatorStartHeight = 1;
@@ -177,7 +177,7 @@ public:
             std::cout << nNoncenew << '\n';
             printf("new mainnet genesis hash: %s\n", genesis.GetHash().ToString().c_str());
         }
-        printf("Genesis Generated");
+
         hashGenesisBlock = genesis.GetHash();
         assert(hashGenesisBlock == uint256("0x0000000ed25232c2c2057359a16431665d99301ea6890adbb6f36b64c3d291d9"));
         assert(genesis.hashMerkleRoot == uint256("0x5648eee81072accaae43339ee1e40537ab634b54673c5157474519d5b84dc55c"));
