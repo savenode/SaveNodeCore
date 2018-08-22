@@ -148,7 +148,7 @@
                   <string>Enter an amount of savenode to convert (mint) to zsnd</string>
                  </property>
                  <property name="text">
-                  <string>Mint SND to zsnd</string>
+                  <string>Mint SNO to zsnd</string>
                  </property>
                 </widget>
                </item>

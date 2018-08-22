@@ -41,11 +41,11 @@ QString BitcoinUnits::id(int unit)
 {
     switch (unit) {
     case savenode:
-        return QString("SND");
+        return QString("SNO");
     case msnd:
-        return QString("msnd");
+        return QString("msno");
     case usnd:
-        return QString::fromUtf8("usnd");
+        return QString::fromUtf8("usno");
     default:
         return QString("???");
     }
@@ -56,22 +56,22 @@ QString BitcoinUnits::name(int unit)
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         switch (unit) {
         case savenode:
-            return QString("SND");
+            return QString("SNO");
         case msnd:
-            return QString("msnd");
+            return QString("msno");
         case usnd:
-            return QString::fromUtf8("μSND");
+            return QString::fromUtf8("μSNO");
         default:
             return QString("???");
         }
     } else {
         switch (unit) {
         case savenode:
-            return QString("tsnd");
+            return QString("tsno");
         case msnd:
-            return QString("mtsnd");
+            return QString("mtsno");
         case usnd:
-            return QString::fromUtf8("μtsnd");
+            return QString::fromUtf8("μtsno");
         default:
             return QString("???");
         }
