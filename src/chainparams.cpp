@@ -184,8 +184,14 @@ public:
 
     		 // vSeeds.push_back(CDNSSeedData("seed1.sndcoin.org", "seed1.sndcoin.org"));             // seed1
           //vSeeds.push_back(CDNSSeedData("seed2.sndcoin.org", "seed2.sndcoin.org"));             // seed2
-          vFixedSeeds.clear();
-          vSeeds.clear();
+          vSeeds.push_back(CDNSSeedData("149.28.146.108", "149.28.146.108"));
+        vSeeds.push_back(CDNSSeedData("45.32.44.183", "45.32.44.183"));
+        vSeeds.push_back(CDNSSeedData("45.32.62.131", "45.32.62.131"));
+        vSeeds.push_back(CDNSSeedData("80.211.76.242", "80.211.76.242"));
+        vSeeds.push_back(CDNSSeedData("108.61.165.91", "108.61.165.91"));
+        vSeeds.push_back(CDNSSeedData("207.148.70.199", "207.148.70.199"));
+        vSeeds.push_back(CDNSSeedData("198.13.57.99", "198.13.57.99"));
+        vSeeds.push_back(CDNSSeedData("45.32.13.117", "45.32.13.117"));
 
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63); // C
