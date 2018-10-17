@@ -78,26 +78,11 @@ inline int64_t GetMstrNodCollateral(int nHeight){
       }
       else if(nHeight >= 100000 && nHeight < 150000)
       {
-        return 16000;
+        return 16000;  // Forking at 100k
       }
-
-      else if(nHeight >= 150000 && nHeight < 300000)
-      {
-        return 32000;
-      }
-      else if(nHeight >= 300000 && nHeight < 1000000)
-      {
-        return 64000;
-      }
-
-      else if(nHeight >= 1000000 && nHeight < 3000000)
-      {
-        return 100000;
-      }
-
       else
       {
-        return 200000;
+        return 32000;
       }
 
 }

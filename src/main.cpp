@@ -2138,16 +2138,16 @@ int64_t GetBlockValue(int nHeight)
           nSubsidy = 100 * COIN;
       } else if (nHeight <= 100000 && nHeight > 60000) {
           nSubsidy = 400 * COIN;
-      } else if (nHeight <= 150000 && nHeight > 100000) {
-          nSubsidy = 1200 * COIN;
-      }  else if (nHeight <= 300000 && nHeight > 150000) {
-            nSubsidy = 2000 * COIN;
-      } else if (nHeight <= 1000000 && nHeight > 300000) {
-          nSubsidy = 750 * COIN;
-      }  else if (nHeight <= 3000000 && nHeight > 1000000) {
-          nSubsidy = 500 * COIN;
+      } else if (nHeight <= 150000 && nHeight > 100000) {    // Forking at block 100k
+          nSubsidy = 400 * COIN;
+      }  else if (nHeight <= 200000 && nHeight > 150000) {
+            nSubsidy = 300 * COIN;
+      } else if (nHeight <= 300000 && nHeight > 200000) {
+          nSubsidy = 200 * COIN;
+      }  else if (nHeight <= 1000000 && nHeight > 300000) {
+          nSubsidy = 100 * COIN;
       }  else {
-          nSubsidy = 10 * COIN;
+          nSubsidy = 50 * COIN;
       }
 
       // Check if we reached the coin max supply.
