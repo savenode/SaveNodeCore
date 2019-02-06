@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017 The savenode developers
+// Copyright (c) 2019 The SaveNode developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <openssl/sha.h>
 #include <boost/assign/list_of.hpp>
+#include "masternode.h"
 
 using namespace std;
 using namespace boost::assign;
@@ -237,6 +238,19 @@ public:
     }
 };
 static CMainParams mainParams;
+
+std::string CChainParams::GetDevFeeRewardAddress()
+{
+	return "SUUUnAkeFp6XXtkNwyPuQQmhBGK1bBCXsW";
+}
+
+CScript CChainParams::GetScriptForDevFeeDestination() {
+    CBitcoinAddress address(GetDevFeeRewardAddress().c_str());
+    assert(address.IsValid());
+
+    CScript script = GetScriptForDestination(address.Get());
+    return script;
+}
 
 /**
  * Testnet (v3)
