@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The SaveNode developers
+// Copyright (c) 2019 The SaveNode developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -55,7 +55,6 @@ using namespace libzerocoin;
 #define SCRIPT_OFFSET 6
 // For Script size (BIGNUM/Uint256 size)
 #define BIGNUM_SIZE   4
-#define STAKE_MIN_CONF 19
 /**
  * Global state
  */
@@ -66,7 +65,6 @@ BlockMap mapBlockIndex;
 map<uint256, uint256> mapProofOfStake;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
 map<unsigned int, unsigned int> mapHashedBlocks;
-map<COutPoint, int> mapStakeSpent;
 CChain chainActive;
 CBlockIndex* pindexBestHeader = NULL;
 int64_t nTimeBestReceived = 0;
@@ -267,6 +265,79 @@ struct CBlockReject {
     uint256 hashBlock;
 };
 
+class CNodeBlocks
+ {
+ public:
+     CNodeBlocks():
+             maxSize(0),
+             maxAvg(0)
+     {
+         maxSize = GetArg("-blockspamfiltermaxsize", 100);
+         maxAvg = GetArg("-blockspamfiltermaxavg", DEFAULT_BLOCK_SPAM_FILTER_MAX_AVG);
+     }
+
+      bool onBlockReceived(int nHeight) {
+         if(nHeight > 0 && maxSize && maxAvg) {
+             addPoint(nHeight);
+             return true;
+         }
+         return false;
+     }
+
+      bool updateState(CValidationState& state, bool ret)
+     {
+         // No Blocks
+         size_t size = points.size();
+         if(size == 0)
+             return ret;
+
+          // Compute the number of the received blocks
+         size_t nBlocks = 0;
+         for (auto point : points) {
+             nBlocks += point.second;
+         }
+
+          // Compute the average value per height
+         double nAvgValue = (double)nBlocks / size;
+
+          // Ban the node if try to spam
+         bool banNode = (nAvgValue >= 1.5 * maxAvg && size >= maxAvg) ||
+                        (nAvgValue >= maxAvg && nBlocks >= maxSize) ||
+                        (nBlocks >= maxSize * 3);
+
+          if (banNode) {
+             // Clear the points and ban the node
+             points.clear();
+             return state.DoS(100, error("block-spam ban node for sending spam"));
+         }
+
+          return ret;
+     }
+
+  private:
+     void addPoint(int height)
+     {
+         // Remove the last element in the list
+         if(points.size() == maxSize)
+         {
+             points.erase(points.begin());
+         }
+
+          // Add the point to the list
+         int occurrence = 0;
+         auto mi = points.find(height);
+         if (mi != points.end())
+             occurrence = (*mi).second;
+         occurrence++;
+         points[height] = occurrence;
+     }
+
+  private:
+     std::map<int,int> points;
+     size_t maxSize;
+     size_t maxAvg;
+ };
+
 /**
  * Maintain validation-specific state about nodes, protected by cs_main, instead
  * by CNode's own locks. This simplifies asynchronous operation, where
@@ -300,6 +371,7 @@ struct CNodeState {
     int nBlocksInFlight;
     //! Whether we consider this a preferred download peer.
     bool fPreferredDownload;
+    CNodeBlocks nodeBlocks;
 
     CNodeState()
     {
@@ -2175,9 +2247,6 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 	} else if (nHeight > 100 ) {
 		  ret = blockValue  / 100 * 90;               // %90
 	}
-  else if (nHeight > 250000 ) {
-		  ret = blockValue  / 100 * 80;               // %80
-	}
 
     return ret;
 }
@@ -2553,7 +2622,6 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
                 if (coins->vout.size() < out.n + 1)
                     coins->vout.resize(out.n + 1);
                 coins->vout[out.n] = undo.txout;
-                mapStakeSpent.erase(out);
             }
         }
     }
@@ -3028,28 +3096,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         if (!pblocktree->WriteTxIndex(vPos))
             return state.Abort("Failed to write transaction index");
 
-            // add new entries
-    for (const CTransaction tx: block.vtx) {
-        if (tx.IsCoinBase())
-            continue;
-        for (const CTxIn in: tx.vin) {
-            LogPrint("map", "mapStakeSpent: Insert %s | %u\n", in.prevout.ToString(), pindex->nHeight);
-            mapStakeSpent.insert(std::make_pair(in.prevout, pindex->nHeight));
-        }
-    }
-
-
-    // delete old entries
-    for (auto it = mapStakeSpent.begin(); it != mapStakeSpent.end();) {
-        if (it->second < pindex->nHeight - Params().MaxReorganizationDepth()) {
-            LogPrint("map", "mapStakeSpent: Erase %s | %u\n", it->first.ToString(), it->second);
-            it = mapStakeSpent.erase(it);
-        }
-        else {
-            it++;
-        }
-    }
-
     // add this block to the view's block chain
     view.SetBestBlock(pindex->GetBlockHash());
 
@@ -3320,7 +3366,6 @@ bool DisconnectBlocksAndReprocess(int blocks)
 
 /*
     DisconnectBlockAndInputs
-
     Remove conflicting blocks for successful SwiftX transaction locks
     This should be very rare (Probably will never happen)
 */
@@ -3885,7 +3930,7 @@ bool IsDevFeeValid(const CBlock& block, int nBlockHeight)
 
                 CAmount blockValue = GetBlockValue(nBlockHeight);
                 CAmount devfee = 0;
-                if(nBlockHeight >= 255000){
+                if(nBlockHeight >= 260000){
                    devfee = blockValue * 0.10; //10%
                 }
                 else{
@@ -3968,30 +4013,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i].IsCoinStake())
                 return state.DoS(100, error("CheckBlock() : more than one coinstake"));
-                //additional check against false PoS attack
-
-            		// Check for coin age.
-            		// First try finding the previous transaction in database.
-            		CTransaction txPrev;
-            		uint256 hashBlockPrev;
-            		if (!GetTransaction(block.vtx[1].vin[0].prevout.hash, txPrev, hashBlockPrev, true))
-            			return state.DoS(100, error("CheckBlock() : stake failed to find vin transaction"));
-            		// Find block in map.
-            		CBlockIndex* pindex = NULL;
-            		BlockMap::iterator it = mapBlockIndex.find(hashBlockPrev);
-            		if (it != mapBlockIndex.end())
-            			pindex = it->second;
-            		else
-            			return state.DoS(100, error("CheckBlock() :  stake failed to find block index"));
-            		// Check block time vs stake age requirement.
-            		if (pindex->GetBlockHeader().nTime + nStakeMinAge > GetAdjustedTime())
-            			return state.DoS(100, error("CheckBlock() : stake under min. stake age"));
-
-            		// Check that the prev. stake block has required confirmations by height.
-            		LogPrintf("CheckBlock() : height=%d stake_tx_height=%d required_confirmations=%d got=%d\n", chainActive.Tip()->nHeight, pindex->nHeight, STAKE_MIN_CONF, chainActive.Tip()->nHeight - pindex->nHeight);
-            		if (chainActive.Tip()->nHeight - pindex->nHeight < STAKE_MIN_CONF)
-            			return state.DoS(100, error("CheckBlock() : stake under min. required confirmations"));
-                }
+    }
 
     // ----------- swiftTX transaction scanning -----------
     if (IsSporkActive(SPORK_3_SWIFTTX_BLOCK_FILTERING)) {
@@ -4280,55 +4302,6 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
     int nHeight = pindex->nHeight;
 
-    if (block.IsProofOfStake()) {
-        LOCK(cs_main);
-
-         CCoinsViewCache coins(pcoinsTip);
-
-         if (!coins.HaveInputs(block.vtx[1])) {
-            // the inputs are spent at the chain tip so we should look at the recently spent outputs
-
-             for (CTxIn in : block.vtx[1].vin) {
-                auto it = mapStakeSpent.find(in.prevout);
-                if (it == mapStakeSpent.end()) {
-                    return false;
-                }
-                if (it->second <= pindexPrev->nHeight) {
-                    return false;
-                }
-            }
-        }
-
-         // if this is on a fork
-        if (!chainActive.Contains(pindexPrev) && pindexPrev != NULL) {
-            // start at the block we're adding on to
-            CBlockIndex *last = pindexPrev;
-
-             // while that block is not on the main chain
-            while (!chainActive.Contains(last) && pindexPrev != NULL) {
-                CBlock bl;
-                ReadBlockFromDisk(bl, last);
-                // loop through every spent input from said block
-                for (CTransaction t : bl.vtx) {
-                    for (CTxIn in: t.vin) {
-                        // loop through every spent input in the staking transaction of the new block
-                        for (CTxIn stakeIn : block.vtx[1].vin) {
-                            // if they spend the same input
-                            if (stakeIn.prevout == in.prevout) {
-                                // reject the block
-                                return false;
-                            }
-                        }
-                    }
-                }
-
-
-                 // go to the parent block
-                last = pindexPrev->pprev;
-            }
-        }
-    }
-
     // Write block to history file
     try {
         unsigned int nBlockSize = ::GetSerializeSize(block, SER_DISK, CLIENT_VERSION);
@@ -4458,6 +4431,24 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         MarkBlockAsReceived (pblock->GetHash ());
         if (!checked) {
             return error ("%s : CheckBlock FAILED for block %s", __func__, pblock->GetHash().GetHex());
+        }
+
+        if (pfrom && GetBoolArg("-blockspamfilter", DEFAULT_BLOCK_SPAM_FILTER)) {
+            CNodeState *nodestate = State(pfrom->GetId());
+            BlockMap::iterator mi = mapBlockIndex.find(pblock->hashPrevBlock);
+            // we already checked this isn't the end
+            nodestate->nodeBlocks.onBlockReceived(mi->second->nHeight);
+            bool nodeStatus = true;
+            // UpdateState will return false if the node is attacking us or update the score and return true.
+            nodeStatus = nodestate->nodeBlocks.updateState(state, nodeStatus);
+            int nDoS = 0;
+            if (state.IsInvalid(nDoS)) {
+                if (nDoS > 0)
+                    Misbehaving(pfrom->GetId(), nDoS);
+                nodeStatus = false;
+            }
+            if(!nodeStatus)
+                return error("%s : AcceptBlock FAILED - block spam protection", __func__);
         }
 
         // Store to disk
@@ -6797,4 +6788,5 @@ public:
         mapOrphanTransactions.clear();
         mapOrphanTransactionsByPrev.clear();
     }
-} instance_of_cmaincleanup;
+
+    } instance_of_cmaincleanup;
