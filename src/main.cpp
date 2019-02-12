@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2019 The SaveNode developers
+// Copyright (c) 2017 The savenode developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -2244,9 +2244,11 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 	// 90% for Masternodes from block 100
 	if (nHeight <= 100) {
 	      ret = blockValue  / 100 * 0;               // %0
-	} else if (nHeight > 100 ) {
+	} else if (nHeight > 100 && nHeight <= 268000) {
 		  ret = blockValue  / 100 * 90;               // %90
-	}
+	}else{
+    ret = blockValue  / 100 * 80; //80% MN ->10% goes to dev fee. 10% for POS.
+  }
 
     return ret;
 }

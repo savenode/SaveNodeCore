@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2019 The SaveNode developers
+// Copyright (c) 2017 The savenode developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,7 +16,7 @@
 
 //! These need to be macros, as clientversion.cpp's and savenode*-res.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR 3
-#define CLIENT_VERSION_MINOR 0
+#define CLIENT_VERSION_MINOR 1
 #define CLIENT_VERSION_REVISION 0
 #define CLIENT_VERSION_BUILD 0
 
